@@ -19,15 +19,14 @@
 #define MAX_ADC_RAW         970 // Max ADC value corresponding to 125 ml (calibrated experimentally)
 #define MAX_VOL_ML          125 // Maximum volume capped for each liquid
 #define TIME_MS_PER_ML      40  // How many milliseconds it takes to pour a single milliliter
-#define ADC_FILTER          4   // The threshold for filtering noise from the potentiometers
+#define ADC_FILTER          15   // The threshold for filtering noise from the potentiometers
 
-// --- SETĂRI TIMPI (Milisecunde) ---
+// Timing constants for the system's operation and user feedback
 #define LCD_REFRESH_RATE    100  // The refresh rate of the screen
-#define IR_PANIC_THRESHOLD  150  // The time required to confirm an error (missing glass)
+#define IR_PANIC_THRESHOLD  20  // The time required to confirm an error (missing glass)
 #define ERROR_DISPLAY_TIME  3000 // How long the error message is displayed
 #define SUCCESS_DISPLAY_TIME 2000 // How long the success message is displayed
 
-// --- SETĂRI COMUNICAȚIE ---
 #define I2C_BIT_RATE 72 // Setting for 100 kHz SCL at 16MHz
 
 #endif /* CONFIG_H */

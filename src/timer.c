@@ -42,6 +42,15 @@ ISR(TIMER1_COMPA_vect) {
     system_ticks++;
 }
 
+uint32_t Get_Safe_Ticks(void) {
+    uint32_t ticks;
+    // Disable and enable interrupts to read the 32-bit variable atomically
+    cli();
+    ticks = system_ticks;
+    sei();
+    return ticks;
+}
+
 /*
  * Advanced non-blocking delay function that constantly monitors the IR sensor.
  * Uses a leaky integrator algorithm to filter out electromagnetic noise.
@@ -49,27 +58,28 @@ ISR(TIMER1_COMPA_vect) {
  */
 uint8_t Wait_And_Check_IR(uint32_t wait_time_ms) {
     // Record the starting time
-    uint32_t start_time = system_ticks;
+    uint32_t start_time = Get_Safe_Ticks();
     
     // Error counter for noise filtering
     uint32_t glass_errors = 0; 
     
     // Time tracking for 1ms checks
-    uint32_t last_check = system_ticks;
+    uint32_t last_check = start_time;
 
     // Loop until the required wait time has elapsed
-    while ((system_ticks - start_time) < wait_time_ms) {
+    while ((Get_Safe_Ticks() - start_time) < wait_time_ms) {
+        uint32_t current_ticks = Get_Safe_Ticks();
         
         // Execute the check exactly once per millisecond
-        if (system_ticks != last_check) {
-            last_check = system_ticks;
+        if (current_ticks != last_check) {
+            last_check = current_ticks;
             
             // Read IR pin. If HIGH (1), the sensor claims the glass is missing.
             if (PIND & (1 << PIND2)) {
                 glass_errors++; // Increase the panic level
                 
                 // If the error persists for 150 net milliseconds, it's real!
-                if (glass_errors > 150) { 
+                if (glass_errors > IR_PANIC_THRESHOLD) { 
                     return 0; // Trigger emergency stop
                 }
             } else {
