@@ -161,7 +161,7 @@ void process_pouring_state(uint8_t vol1, uint8_t vol2, uint8_t vol3, uint8_t *sy
     }
 
     // --- FINALIZATION & CLEANUP ---
-    LCD_Cmd(0x01); 
+    LCD_Init();
 
     if (glass_error == 1) {
         LCD_SetCursor(0, 0); 
